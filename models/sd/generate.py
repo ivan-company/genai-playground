@@ -1,12 +1,16 @@
+import os
 import torch
 from diffusers import StableDiffusionPipeline
-from utils import IMAGE_HEIGHT, IMAGE_WIDTH, GENERATE_PROMPT, GENERATE_NEGATIVE_PROMPT
+from constants import IMAGE_HEIGHT, IMAGE_WIDTH, GENERATE_PROMPT, GENERATE_NEGATIVE_PROMPT, OUTPUT_FOLDER
 
 
-def run():
+MODEL = "stabilityai/stable-diffusion-2-1"
+
+
+def run(output_prefix, *args, **kwargs):
+    output_path = os.path.join(OUTPUT_FOLDER, f"{output_prefix}_image.png")
     # Load the pipeline with MPS support for M4
-    pipe = StableDiffusionPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-2-1")
+    pipe = StableDiffusionPipeline.from_pretrained(MODEL)
 
     # Use MPS for M4 hardware acceleration
     pipe = pipe.to("mps")
@@ -25,4 +29,4 @@ def run():
     ).images[0]
 
     # Save the image
-    image.save("output/sd_image.png")
+    image.save(output_path)

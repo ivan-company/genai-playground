@@ -2,18 +2,17 @@ import argparse
 import importlib.util
 import sys
 import os
+from pathlib import Path
 from rich import print
 from rich.console import Console
 from dotenv import load_dotenv
 
 load_dotenv()
-
-
 console = Console()
 
 
 def call_dynamic_function(model, action, *args, **kwargs):
-    module_path = f"{model}/{action}.py"
+    module_path = f"models/{model}/{action}.py"
     try:
         # Load the module specification
         spec = importlib.util.spec_from_file_location(
@@ -38,35 +37,41 @@ def call_dynamic_function(model, action, *args, **kwargs):
 
 
 if __name__ == '__main__':
+    available_models = [f.name for f in Path("models").iterdir() if f.is_dir()]
+    available_actions = [f.name.replace(".py", "") for f in Path(
+        "models/sd").iterdir() if f.suffix == ".py" and f.name != "__init__.py"]
+    available_images = [f.name.replace(".png", "")
+                        for f in Path("input").iterdir() if f.suffix == ".png"]
     parser = argparse.ArgumentParser(
         description='GenAI image generation/edition')
-    parser.add_argument('-m', '--model', type=str, choices=["dalle", "sd", "all"], default="all",
+    parser.add_argument('-m', '--model', type=str, choices=available_models + ["all"], default="all",
                         help='The model to use for the generation')
-    parser.add_argument('-a', '--action', type=str, choices=["generate", "outpaint", "background", "all"], default="all",
+    parser.add_argument('-a', '--action', type=str, choices=available_actions + ["all"], default="all",
                         help='The action to perform')
-    parser.add_argument('-i', '--images', type=str, default="all")
+    parser.add_argument('-i', '--images', type=str,
+                        default="all", help='The image to process')
     args = parser.parse_args()
 
+    models, actions, images = [], [], []
+
     if args.model == "all":
-        models = ["dalle", "sd"]
+        models = available_models
     else:
         models = [args.model]
 
     if args.action == "all":
-        actions = ["generate", "outpaint", "background"]
+        actions = available_actions
     else:
         actions = [args.action]
 
     if args.images == "all":
-        args.images = []
-        for filename in os.listdir("input"):
-            if filename.endswith(".png"):
-                args.images.append(filename.replace(".png", ""))
+        images = available_images
     else:
-        args.images = [args.images]
+        images = [args.images]
 
     for model in models:
         for action in actions:
-            console.print(f"Running {model} {action}...")
-            call_dynamic_function(model, action, args.images)
-            console.print(f"Finished {model} {action}...")
+            with console.status(f"Processing {model} {action}..."):
+                call_dynamic_function(model, action, image_names=images,
+                                      output_prefix=f"{model}_{action}")
+            console.print("Done!")
