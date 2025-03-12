@@ -1,4 +1,7 @@
 import argparse
+import importlib.util
+import sys
+import os
 from rich import print
 from rich.console import Console
 from dotenv import load_dotenv
@@ -9,38 +12,61 @@ load_dotenv()
 console = Console()
 
 
+def call_dynamic_function(model, action, *args, **kwargs):
+    module_path = f"{model}/{action}.py"
+    try:
+        # Load the module specification
+        spec = importlib.util.spec_from_file_location(
+            f"{model}_{action}", module_path)
+        if spec is None:
+            raise ImportError(f"Could not find module at {module_path}")
+
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[f"{model}_{action}"] = module
+
+        spec.loader.exec_module(module)
+
+        if not hasattr(module, "run"):
+            raise AttributeError(
+                f"Module {module_path} does not have a 'run' function")
+
+        return module.run(*args, **kwargs)
+
+    except (ImportError, AttributeError) as e:
+        print(f"Error: {e}")
+        return None
+
+
 if __name__ == '__main__':
-    # First we read the user input
     parser = argparse.ArgumentParser(
         description='GenAI image generation/edition')
     parser.add_argument('-m', '--model', type=str, choices=["dalle", "sd", "all"], default="all",
                         help='The model to use for the generation')
-    parser.add_argument('-a', '--action', type=str, choices=["generate", "outpaint", "all"], default="all",
+    parser.add_argument('-a', '--action', type=str, choices=["generate", "outpaint", "background", "all"], default="all",
                         help='The action to perform')
+    parser.add_argument('-i', '--images', type=str, default="all")
     args = parser.parse_args()
 
-    # Then we execute the corresponding code
-    if args.model == "dalle" or args.model == "all":
-        if args.action == "generate" or args.action == "all":
-            from dalle.generate import run
-            print("Generating image with DALL-E")
-            with console.status("[bold green]Generating..."):
-                run()
-        if args.action == "outpaint" or args.action == "all":
-            from dalle.outpaint import run
-            print("Outpainting image with DALL-E")
-            with console.status("[bold green]Outpainting..."):
-                run()
-    if args.model == "sd" or args.model == "all":
-        if args.action == "generate" or args.action == "all":
-            from sd.generate import run
-            print("Generating image with Stable Diffusion")
-            with console.status("[bold green]Generating..."):
-                run()
-        if args.action == "outpaint" or args.action == "all":
-            from sd.outpaint import run
-            print("Outpainting image with Stable Diffusion")
-            with console.status("[bold green]Outpainting..."):
-                run()
+    if args.model == "all":
+        models = ["dalle", "sd"]
+    else:
+        models = [args.model]
 
-    print("Done!")
+    if args.action == "all":
+        actions = ["generate", "outpaint", "background"]
+    else:
+        actions = [args.action]
+
+    if args.images == "all":
+        args.images = []
+        for filename in os.listdir("input"):
+            if filename.endswith(".png"):
+                args.images.append(filename.replace(".png", ""))
+    else:
+        args.images = [args.images]
+
+    for model in models:
+        for action in actions:
+            console.print(f"Running {model} {action}...")
+            call_dynamic_function(model, action, args.images)
+            console.print(f"Finished {model} {action}...")
