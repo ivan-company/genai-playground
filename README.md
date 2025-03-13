@@ -23,7 +23,7 @@ OPENAPI_API_KEY=<your_key>
 
 Once you have that, you can customize the output on of the tool in different ways:
 
-- Inside the "input" folder, you have all the images that will be available for the tool. Whenever you do `python -m main -m sd -a outpaint sample_1` you are asking DALL-E to gather the image `input/sample_1.png`
+- Inside the "input" folder, you have all the images that will be available for the tool. Whenever you do `python -m main -m sd -a outpaint -i sample_1` you are asking DALL-E to gather the image `input/sample_1.png`
 - If you want to change prompting used on image generation or outpainting, just go to the `constants.py` file and change it
 
 ## Usage
