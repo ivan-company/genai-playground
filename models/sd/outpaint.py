@@ -19,7 +19,9 @@ def outpaint(pipe, image_name, output_prefix, *args, **kwargs):
         OUTPUT_FOLDER, f"{output_prefix}_{image_name}.png")
 
     image = open_image(input_path)
-    image = image.resize((256, 256), Image.LANCZOS)
+    # image = image.resize((256, 256), Image.LANCZOS)
+    image = image.resize(
+        (round(image.width / 8) * 8, round(image.height / 8) * 8), Image.LANCZOS)
     extended_image, mask = create_mask(image, 128)
 
     # Run outpainting

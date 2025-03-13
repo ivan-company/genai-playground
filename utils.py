@@ -2,7 +2,13 @@ from PIL import Image, ImageFilter
 
 
 def open_image(path):
-    return Image.open(path).convert("RGB")
+    max_size = 512
+    image = Image.open(path).convert("RGB")
+
+    if image.width > max_size or image.height > max_size:
+        image.thumbnail((max_size, max_size))
+        image.save(path)
+    return image
 
 
 def create_mask(image: Image, expand_pixels=256):
