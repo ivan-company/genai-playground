@@ -3,12 +3,14 @@ import torch
 from diffusers import StableDiffusionInpaintPipeline
 from PIL import Image
 from rich import print
+from models.sd.classify import classify
 
 from utils import (
     open_image,
     create_mask,
+    generate_ad_prompt
 )
-from constants import OUTPAINT_PROMPT, OUTPUT_FOLDER, INPUT_FOLDER, OUTPAINT_NEGATIVE_PROMPT
+from constants import OUTPUT_FOLDER, INPUT_FOLDER
 
 MODEL = "stabilityai/stable-diffusion-2-inpainting"
 
@@ -18,6 +20,12 @@ def outpaint(pipe, image_name, output_prefix, *args, **kwargs):
     output_path = os.path.join(
         OUTPUT_FOLDER, f"{output_prefix}_{image_name}.png")
 
+    classification_results = classify(image_name)
+    print(f"Ad classified as: {classification_results}")
+
+    prompts = generate_ad_prompt(classification_results)
+    print(f"Prompts: {prompts}")
+
     image = open_image(input_path)
     # image = image.resize((256, 256), Image.LANCZOS)
     image = image.resize(
@@ -26,14 +34,14 @@ def outpaint(pipe, image_name, output_prefix, *args, **kwargs):
 
     # Run outpainting
     result = pipe(
-        prompt=OUTPAINT_PROMPT,
-        negative_prompt=OUTPAINT_NEGATIVE_PROMPT,
+        prompt=prompts["prompt"],
+        negative_prompt=prompts["negative_prompt"],
         image=extended_image,
         mask_image=mask.resize(
             (extended_image.width, extended_image.height), Image.LANCZOS
         ),
-        num_inference_steps=30,  # Increase for better quality
-        guidance_scale=6.0,
+        num_inference_steps=40,  # Increase for better quality
+        guidance_scale=7.5,
         width=extended_image.width,
         height=extended_image.height,
     ).images[0]
