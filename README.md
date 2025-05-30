@@ -21,6 +21,12 @@ First, if you want to try the "dalle" models, you'll need an API key. Once you g
 OPENAPI_API_KEY=<your_key>
 ```
 
+If you want to use Gemini, you'll need a a Google API Key and then set it up in the env file:
+
+```bash
+GOOGLE_API_KEY=<your_key>
+```
+
 Once you have that, you can customize the output on of the tool in different ways:
 
 - Inside the "input" folder, you have all the images that will be available for the tool. Whenever you do `python -m main -m sd -a outpaint -i sample_1` you are asking DALL-E to gather the image `input/sample_1.png`
