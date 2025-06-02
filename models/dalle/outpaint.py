@@ -1,7 +1,6 @@
 import os
 from openai import OpenAI
 import requests
-from rich import print
 from PIL import Image
 
 from utils import (
@@ -14,8 +13,7 @@ from constants import OUTPAINT_PROMPT, OUTPUT_FOLDER, INPUT_FOLDER
 
 def outpaint_image(image_name, output_prefix):
     input_path = os.path.join(INPUT_FOLDER, f"{image_name}.png")
-    output_path = os.path.join(
-        OUTPUT_FOLDER, f"{output_prefix}_{image_name}.png")
+    output_path = os.path.join(OUTPUT_FOLDER, f"{output_prefix}_{image_name}.png")
 
     client = OpenAI()
     image = open_image(input_path)

@@ -1,0 +1,21 @@
+[project]
+name = "genaiworkshop"
+version = "0.1.0"
+description = "GenAI workshop to explore different implementations potentially used for StackAdapt"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    'rich',
+    'python-dotenv',
+    'openai',
+    'requests',
+    'pillow',
+    'google-genai',
+    'torch',
+    'torchvision',
+    'transformers',
+    'diffusers',
+    'numpy',
+    'kornia',
+    'timm',
+]

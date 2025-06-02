@@ -42,6 +42,7 @@ def classify(image_name):
     results = [(ad_categories[idx], prob.item())
                for idx, prob in zip(top_indices[0], top_probs[0])]
 
+    print(results)
     return results
 
 
