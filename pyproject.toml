@@ -1,9 +1,12 @@
+[tool.setuptools.packages.find]
+where = ["genai_workshop"]
+
 [project]
 name = "genaiworkshop"
 version = "0.1.0"
 description = "GenAI workshop to explore different implementations potentially used for StackAdapt"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "==3.10.9"
 dependencies = [
     'rich',
     'python-dotenv',
@@ -18,4 +21,5 @@ dependencies = [
     'numpy',
     'kornia',
     'timm',
+    "stackadapt.py-gpt-service @ file:///Users/ivan.company/dev/stackadapt/py-gpt-service"
 ]

@@ -11,10 +11,11 @@ console = Console()
 
 
 def call_dynamic_function(model, action, *args, **kwargs):
-    module_path = f"models/{model}/{action}.py"
+    module_path = f"genai_workshop/models/{model}/{action}.py"
     try:
         # Load the module specification
-        spec = importlib.util.spec_from_file_location(f"{model}_{action}", module_path)
+        spec = importlib.util.spec_from_file_location(
+            f"{model}_{action}", module_path)
         if spec is None:
             raise ImportError(f"Could not find module at {module_path}")
 
@@ -24,7 +25,8 @@ def call_dynamic_function(model, action, *args, **kwargs):
         spec.loader.exec_module(module)
 
         if not hasattr(module, "run"):
-            raise AttributeError(f"Module {module_path} does not have a 'run' function")
+            raise AttributeError(
+                f"Module {module_path} does not have a 'run' function")
 
         return module.run(*args, **kwargs)
 
@@ -34,10 +36,11 @@ def call_dynamic_function(model, action, *args, **kwargs):
 
 
 if __name__ == "__main__":
-    available_models = [f.name for f in Path("models").iterdir() if f.is_dir()]
+    available_models = [f.name for f in Path(
+        "genai_workshop/models").iterdir() if f.is_dir()]
     available_actions = [
         f.name.replace(".py", "")
-        for f in Path("models/sd").iterdir()
+        for f in Path("genai_workshop/models/sd").iterdir()
         if f.suffix == ".py" and f.name != "__init__.py"
     ]
     available_images = [
@@ -45,7 +48,8 @@ if __name__ == "__main__":
         for f in Path("input").iterdir()
         if f.suffix == ".png"
     ]
-    parser = argparse.ArgumentParser(description="GenAI image generation/edition")
+    parser = argparse.ArgumentParser(
+        description="GenAI image generation/edition")
     parser.add_argument(
         "-m",
         "--model",
