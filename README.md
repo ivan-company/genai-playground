@@ -47,3 +47,23 @@ uv run main.py -m sd
 ```
 
 will mean: "run all the actions over all the images for StableDiffusion"
+
+## Troubleshooting
+
+### Issues running py_gpt
+
+If you have any issues with the py_gpt service and you want to work with your local version of the py-gpt-service, you can do the following:
+
+- Remove the installation of py-gpt-service
+
+```bash
+uv pip uninstall "stackadapt.py-gpt-service"
+```
+
+- Locally link your py-gpt-service to this project
+
+```bash
+ln -s ~/dev/stackadapt/py-gpt-service/py_gpt .venv/lib/python3.10/site-packages/py_gpt
+```
+
+This should help you troubleshoot the issue
